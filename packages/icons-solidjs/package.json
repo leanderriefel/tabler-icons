@@ -19,18 +19,21 @@
   },
   "sideEffects": false,
   "type": "module",
-  "source": "./src/tabler-icons-solidjs.ts",
+  "amdName": "TablerIconsSolidjs",
   "exports": {
     ".": {
-      "types": "./dist/types/tabler-icons-solidjs.d.ts",
-      "solid": "./dist/source/tabler-icons-solidjs.js",
-      "import": "./dist/esm/tabler-icons-solidjs.js",
-      "require": "./dist/cjs/tabler-icons-solidjs.js"
+      "import": {
+        "types": "./dist/tabler-icons-solidjs.d.ts",
+        "default": "./dist/esm/tabler-icons-solidjs.js"
+      },
+      "require": {
+        "types": "./dist/cjs/tabler-icons-solidjs.d.cts",
+        "default": "./dist/cjs/tabler-icons-solidjs.cjs"
+      }
     }
   },
-  "main": "./dist/cjs/tabler-icons-solidjs.js",
-  "module": "./dist/esm/tabler-icons-solidjs.js",
-  "types": "./dist/types/tabler-icons-solidjs.d.ts",
+  "main": "./dist/cjs/tabler-icons-solidjs.cjs",
+  "types": "./dist/cjs/tabler-icons-solidjs.d.cts",
   "files": [
     "dist"
   ],

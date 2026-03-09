@@ -7,7 +7,7 @@ export interface IconProps extends SVGAttributes {
   key?: string | number;
   color?: string;
   size?: string | number;
-  stroke?: string | number;
+  strokeWidth?: string | number;
   title?: string;
   class?: string;
 }

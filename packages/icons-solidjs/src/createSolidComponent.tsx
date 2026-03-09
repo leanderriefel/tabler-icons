@@ -1,68 +1,57 @@
-import { splitProps, mergeProps } from 'solid-js';
-import type { JSX } from 'solid-js';
+import { splitProps } from 'solid-js';
+import { Dynamic } from 'solid-js/web';
+import { JSX } from 'solid-js/jsx-runtime';
 import defaultAttributes from './defaultAttributes';
-import type { IconProps } from './types';
+import { IconNode, IconProps } from './types';
+
+type InternalIconProps = Omit<IconProps, 'stroke'> & {
+  stroke?: string | number;
+};
 
 const createSolidComponent = (
   type: 'outline' | 'filled',
   iconName: string,
   iconNamePascal: string,
-  iconContent: string,
+  iconNode: IconNode,
 ) => {
   const Component = (props: IconProps): JSX.Element => {
-    const [localProps, rest] = splitProps(props, [
+    const [localProps, rest] = splitProps(props as InternalIconProps, [
       'color',
       'size',
       'stroke',
       'title',
       'children',
-      'class',
-    ]);
+      'class'
+    ]),
+      attributes = defaultAttributes[type];
 
-    const attributes = defaultAttributes[type];
-
-    const svgProps = mergeProps(attributes, rest, {
-      get width() {
-        return localProps.size ?? attributes.width;
-      },
-      get height() {
-        return localProps.size ?? attributes.height;
-      },
-      get class() {
-        return `tabler-icon tabler-icon-${iconName} ${localProps.class ?? ''}`;
-      },
-      ...(type === 'filled'
-        ? {
-            get fill() {
-              return localProps.color ?? 'currentColor';
-            },
-          }
-        : {
-            get stroke() {
-              return localProps.color ?? 'currentColor';
-            },
-            get ['stroke-width']() {
-              return localProps.stroke ?? attributes['stroke-width'];
-            },
-          }),
-    });
-
-    // Use innerHTML for SSR compatibility — the icon paths are static and
-    // pre-computed at build time, so there is no need for Solid's
-    // fine-grained reactivity on the inner SVG elements.
     return (
       <svg
-        {...svgProps}
-        innerHTML={
-          localProps.title
-            ? `<title>${String(localProps.title).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</title>${iconContent}`
-            : iconContent
-        }
-      />
+        {...attributes}
+        width={localProps.size != null ? localProps.size : attributes.width}
+        height={localProps.size != null ? localProps.size : attributes.height}
+        {...(type === 'filled'
+          ? {
+              fill: localProps.color != null ? localProps.color : 'currentColor',
+            }
+          : {
+              stroke: localProps.color != null ? localProps.color : 'currentColor',
+              'stroke-width':
+                localProps.stroke != null ? localProps.stroke : attributes['stroke-width'],
+            })}
+        class={`tabler-icon tabler-icon-${iconName} ${localProps.class != null ? localProps.class : ''}`}
+        {...rest}
+      >
+        {localProps.title && <title>{localProps.title}</title>}
+        {iconNode.map(([tag, attrs]) => (
+          <Dynamic component={tag} {...attrs} />
+        ))}
+        {localProps.children}
+      </svg>
     );
   };
 
-  Component.displayName = iconNamePascal;
+  Component.displayName = `${iconNamePascal}`;
   return Component;
 };
 
